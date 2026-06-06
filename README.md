@@ -26,8 +26,6 @@ Edit `src/app.module.ts` and set your PostgreSQL password.
 ```bash
 npm run start:dev
 ```
-
-<<<<<<< HEAD
 ### 5. Open Swagger UI
 Visit: http://localhost:3000/api
 

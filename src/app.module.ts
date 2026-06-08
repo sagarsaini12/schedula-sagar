@@ -9,6 +9,8 @@ import { AppController } from './app.controller';
 
 
 import { User } from './users/user.entity';
+import { DoctorProfile } from './doctor/entities/doctor-profile.entity';
+import { PatientProfile } from './patient/entities/patient-profile.entity';
 
 @Module({
   controllers: [AppController],
@@ -22,8 +24,12 @@ import { User } from './users/user.entity';
       username: 'postgres',
       password: 'sagar',
       database: 'schedula',
-      entities: [User],
-      synchronize: true,
+      entities: [
+  User,
+  DoctorProfile,
+  PatientProfile,
+],
+synchronize: true,
     }),
 
     AuthModule,

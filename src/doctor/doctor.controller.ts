@@ -4,6 +4,8 @@ import {
   Get,
   Patch,
   Post,
+  Param,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -18,16 +20,32 @@ import { DoctorService } from './doctor.service';
 
 import { CreateDoctorProfileDto } from './dto/create-doctor-profile.dto';
 import { UpdateDoctorProfileDto } from './dto/update-doctor-profile.dto';
+import { GetDoctorsQueryDto } from './dto/get-doctors-query.dto';
 
-@ApiBearerAuth()
 @Controller('doctor')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('DOCTOR')
 export class DoctorController {
   constructor(
     private readonly doctorService: DoctorService,
   ) {}
 
+  // =========================
+  // DAY 4 APIs
+  // =========================
+
+  @Get()
+  getDoctors(
+    @Query() query: GetDoctorsQueryDto,
+  ) {
+    return this.doctorService.getDoctors(query);
+  }
+
+  // =========================
+  // DAY 3 APIs
+  // =========================
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('DOCTOR')
   @Post('profile')
   createProfile(
     @Request() req: any,
@@ -39,6 +57,9 @@ export class DoctorController {
     );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('DOCTOR')
   @Get('profile')
   getProfile(@Request() req: any) {
     return this.doctorService.getProfile(
@@ -46,6 +67,9 @@ export class DoctorController {
     );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('DOCTOR')
   @Patch('profile')
   updateProfile(
     @Request() req: any,
@@ -55,5 +79,16 @@ export class DoctorController {
       req.user.id,
       dto,
     );
+  }
+
+  // =========================
+  // DAY 4 Doctor Details API
+  // =========================
+
+  @Get(':id')
+  getDoctorById(
+    @Param('id') id: string,
+  ) {
+    return this.doctorService.getDoctorById(id);
   }
 }

@@ -31,6 +31,11 @@ export class DoctorProfile {
   @Column()
   availabilityHours!: string;
 
+  @Column({
+  default: true,
+})
+availabilityStatus!: boolean;
+
   @Column({ nullable: true })
   profileDetails!: string;
 

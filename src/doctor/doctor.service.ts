@@ -200,3 +200,18 @@ export class DoctorService {
     },
   };
 }
+async getDoctorById(id: string) {
+  const doctor =
+    await this.doctorRepository.findOne({
+      where: { id },
+    });
+
+  if (!doctor) {
+    throw new NotFoundException(
+      'Doctor not found',
+    );
+  }
+
+  return doctor;
+}
+}

@@ -8,9 +8,12 @@ import { DoctorProfile } from './entities/doctor-profile.entity';
 
 import { UsersModule } from '../users/users.module';
 
+import { AvailabilityModule } from './availability/availability.module';
+
 @Module({
   imports: [
     UsersModule,
+    AvailabilityModule,
     TypeOrmModule.forFeature([
       DoctorProfile,
     ]),

@@ -7,6 +7,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+
+
+import { CreateCustomAvailabilityDto } from './dto/create-custom-availability.dto';
+
 import { DoctorProfile } from '../entities/doctor-profile.entity';
 
 import { RecurringAvailability } from './entities/recurring-availability.entity';
@@ -63,49 +67,72 @@ export class AvailabilityService {
     return doctor;
   }
 
-  async createRecurringAvailability(
-    userId: string,
-    dto: CreateRecurringAvailabilityDto,
-  ) {
-    const doctor =
-      await this.resolveDoctorProfile(userId);
+ async createRecurringAvailability(
+  userId: string,
+  dto: CreateRecurringAvailabilityDto,
+) {
+  const doctor =
+    await this.resolveDoctorProfile(userId);
 
-    if (dto.startTime >= dto.endTime) {
-      throw new ConflictException(
-        'End time must be greater than start time',
-      );
-    }
-
-    const existing =
-      await this.recurringRepository.findOne({
-        where: {
-          doctor: {
-            id: doctor.id,
-          },
-          dayOfWeek: dto.dayOfWeek,
-          startTime: dto.startTime,
-          endTime: dto.endTime,
-        },
-        relations: ['doctor'],
-      });
-
-    if (existing) {
-      throw new ConflictException(
-        'Availability already exists',
-      );
-    }
-
-    const availability =
-      this.recurringRepository.create({
-        ...dto,
-        doctor,
-      });
-
-    return this.recurringRepository.save(
-      availability,
+  if (dto.startTime >= dto.endTime) {
+    throw new ConflictException(
+      'End time must be greater than start time',
     );
   }
 
+  const allSlots =
+    await this.recurringRepository.find({
+      where: {
+        doctor: {
+          id: doctor.id,
+        },
+        dayOfWeek: dto.dayOfWeek,
+      },
+      relations: ['doctor'],
+    });
+
+  const hasOverlap =
+    allSlots.some(
+      (slot) =>
+        dto.startTime < slot.endTime &&
+        dto.endTime > slot.startTime,
+    );
+
+  if (hasOverlap) {
+    throw new ConflictException(
+      'Availability slot overlaps with existing slot',
+    );
+  }
+
+  const existing =
+    await this.recurringRepository.findOne({
+      where: {
+        doctor: {
+          id: doctor.id,
+        },
+        dayOfWeek: dto.dayOfWeek,
+        startTime: dto.startTime,
+        endTime: dto.endTime,
+      },
+      relations: ['doctor'],
+    });
+
+  if (existing) {
+    throw new ConflictException(
+      'Availability already exists',
+    );
+  }
+
+  const availability =
+    this.recurringRepository.create({
+      ...dto,
+      doctor,
+    });
+
+  return this.recurringRepository.save(
+    availability,
+  );
+}
   async getRecurringAvailabilities(
     userId: string,
   ) {
@@ -202,4 +229,121 @@ async deleteRecurringAvailability(
       'Availability deleted successfully',
   };
 }
+async createCustomAvailability(
+  userId: string,
+  dto: CreateCustomAvailabilityDto,
+) {
+  const doctor =
+    await this.resolveDoctorProfile(userId);
+
+  if (dto.startTime >= dto.endTime) {
+    throw new ConflictException(
+      'End time must be greater than start time',
+    );
+  }
+
+  const allSlots =
+    await this.customRepository.find({
+      where: {
+        doctor: {
+          id: doctor.id,
+        },
+        date: dto.date,
+      },
+      relations: ['doctor'],
+    });
+
+  const hasOverlap =
+    allSlots.some(
+      (slot) =>
+        dto.startTime < slot.endTime &&
+        dto.endTime > slot.startTime,
+    );
+
+  if (hasOverlap) {
+    throw new ConflictException(
+      'Custom availability overlaps with existing slot',
+    );
+  }
+
+  const existing =
+    await this.customRepository.findOne({
+      where: {
+        doctor: {
+          id: doctor.id,
+        },
+        date: dto.date,
+        startTime: dto.startTime,
+        endTime: dto.endTime,
+      },
+      relations: ['doctor'],
+    });
+
+  if (existing) {
+    throw new ConflictException(
+      'Custom availability already exists',
+    );
+  }
+
+  const availability =
+    this.customRepository.create({
+      ...dto,
+      doctor,
+    });
+
+  return this.customRepository.save(
+      availability,
+    );
+}
+async getAvailabilityByDate(
+  userId: string,
+  date: string,
+) {
+  const doctor =
+    await this.resolveDoctorProfile(userId);
+
+  const customAvailabilities =
+    await this.customRepository.find({
+      where: {
+        doctor: {
+          id: doctor.id,
+        },
+        date,
+      },
+      relations: ['doctor'],
+    });
+
+  if (customAvailabilities.length > 0) {
+    return {
+      source: 'CUSTOM_OVERRIDE',
+      data: customAvailabilities,
+    };
+  }
+
+  const dayOfWeek = new Date(date)
+    .toLocaleDateString('en-US', {
+      weekday: 'long',
+    })
+    .toUpperCase();
+
+    
+
+  const recurringAvailabilities =
+    await this.recurringRepository.find({
+      where: {
+        doctor: {
+          id: doctor.id,
+        },
+        dayOfWeek: dayOfWeek as any,
+      },
+      relations: ['doctor'],
+    });
+
+  return {
+    source: 'RECURRING',
+    data: recurringAvailabilities,
+  };
+}
+
+
 }

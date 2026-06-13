@@ -8,8 +8,8 @@ import {
   Request,
   UseGuards,
   Delete,
+  Query,
 } from '@nestjs/common';
-
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -17,6 +17,8 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 
 import { AvailabilityService } from './availability.service';
+
+import { CreateCustomAvailabilityDto } from './dto/create-custom-availability.dto';
 
 import { UpdateRecurringAvailabilityDto } from './dto/update-recurring-availability.dto';
 import { CreateRecurringAvailabilityDto } from './dto/create-recurring-availability.dto';
@@ -80,6 +82,33 @@ deleteAvailability(
   return this.availabilityService.deleteRecurringAvailability(
     req.user.id,
     id,
+  );
+}
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('DOCTOR')
+@Post('override')
+createOverride(
+  @Request() req: any,
+  @Body()
+  dto: CreateCustomAvailabilityDto,
+) {
+  return this.availabilityService.createCustomAvailability(
+    req.user.id,
+    dto,
+  );
+}
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('DOCTOR')
+@Get('date')
+getAvailabilityByDate(
+  @Request() req: any,
+  @Query('date') date: string,
+) {
+  return this.availabilityService.getAvailabilityByDate(
+    req.user.id,
+    date,
   );
 }
 }

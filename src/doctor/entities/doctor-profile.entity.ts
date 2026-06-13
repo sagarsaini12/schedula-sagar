@@ -1,3 +1,8 @@
+import { OneToMany } from 'typeorm';
+
+import { RecurringAvailability } from '../availability/entities/recurring-availability.entity';
+import { CustomAvailability } from '../availability/entities/custom-availability.entity';
+
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -42,4 +47,17 @@ availabilityStatus!: boolean;
   @OneToOne(() => User)
   @JoinColumn()
   user!: User;
+
+@OneToMany(
+  () => RecurringAvailability,
+  (availability) => availability.doctor,
+)
+recurringAvailabilities!: RecurringAvailability[];
+
+@OneToMany(
+  () => CustomAvailability,
+  (availability) => availability.doctor,
+)
+customAvailabilities!: CustomAvailability[];
+
 }

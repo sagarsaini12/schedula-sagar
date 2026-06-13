@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { RecurringAvailability } from './doctor/availability/entities/recurring-availability.entity';
+import { CustomAvailability } from './doctor/availability/entities/custom-availability.entity';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { DoctorModule } from './doctor/doctor.module';
@@ -24,10 +26,12 @@ import { PatientProfile } from './patient/entities/patient-profile.entity';
   type: 'postgres',
   url: process.env.DATABASE_URL,
   entities: [
-    User,
-    DoctorProfile,
-    PatientProfile,
-  ],
+  User,
+  DoctorProfile,
+  PatientProfile,
+  RecurringAvailability,
+  CustomAvailability,
+],
   synchronize: true,
   ssl: {
     rejectUnauthorized: false,
@@ -39,5 +43,9 @@ import { PatientProfile } from './patient/entities/patient-profile.entity';
     DoctorModule,
     PatientModule,
   ],
+
+  
 })
+
+
 export class AppModule {}

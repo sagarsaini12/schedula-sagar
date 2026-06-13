@@ -84,11 +84,10 @@ export class DoctorController {
   // =========================
   // DAY 4 Doctor Details API
   // =========================
-
-  @Get(':id')
-  getDoctorById(
-    @Param('id') id: string,
-  ) {
-    return this.doctorService.getDoctorById(id);
-  }
+@Get('details/:id')
+getDoctorById(
+  @Param('id') id: string,
+) {
+  return this.doctorService.getDoctorById(id);
+}
 }

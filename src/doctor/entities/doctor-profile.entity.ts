@@ -1,3 +1,8 @@
+import { OneToMany } from 'typeorm';
+
+import { RecurringAvailability } from '../availability/entities/recurring-availability.entity';
+import { CustomAvailability } from '../availability/entities/custom-availability.entity';
+
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -31,10 +36,28 @@ export class DoctorProfile {
   @Column()
   availabilityHours!: string;
 
+  @Column({
+  default: true,
+})
+availabilityStatus!: boolean;
+
   @Column({ nullable: true })
   profileDetails!: string;
 
   @OneToOne(() => User)
   @JoinColumn()
   user!: User;
+
+@OneToMany(
+  () => RecurringAvailability,
+  (availability) => availability.doctor,
+)
+recurringAvailabilities!: RecurringAvailability[];
+
+@OneToMany(
+  () => CustomAvailability,
+  (availability) => availability.doctor,
+)
+customAvailabilities!: CustomAvailability[];
+
 }

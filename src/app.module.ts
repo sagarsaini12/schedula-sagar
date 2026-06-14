@@ -9,7 +9,7 @@ import { UsersModule } from './users/users.module';
 import { DoctorModule } from './doctor/doctor.module';
 import { PatientModule } from './patient/patient.module';
 import { AppController } from './app.controller';
-
+import { SlotsModule } from './slots/slots.module';
 
 import { User } from './users/user.entity';
 import { DoctorProfile } from './doctor/entities/doctor-profile.entity';
@@ -27,6 +27,7 @@ import { PatientProfile } from './patient/entities/patient-profile.entity';
   url: process.env.DATABASE_URL,
   entities: [
   User,
+  // SlotsModule,
   DoctorProfile,
   PatientProfile,
   RecurringAvailability,
@@ -42,6 +43,7 @@ import { PatientProfile } from './patient/entities/patient-profile.entity';
     UsersModule,
     DoctorModule,
     PatientModule,
+    SlotsModule,
   ],
 
   

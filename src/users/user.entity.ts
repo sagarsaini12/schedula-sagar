@@ -3,7 +3,11 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  OneToOne,
 } from 'typeorm';
+
+import { DoctorProfile } from '../doctor/entities/doctor-profile.entity';
+import { PatientProfile } from '../patient/entities/patient-profile.entity';
 
 export enum Role {
   DOCTOR = 'DOCTOR',
@@ -30,6 +34,18 @@ export class User {
     default: Role.PATIENT,
   })
   role!: Role;
+
+  @OneToOne(
+    () => DoctorProfile,
+    (doctorProfile) => doctorProfile.user,
+  )
+  doctorProfile!: DoctorProfile;
+
+  @OneToOne(
+    () => PatientProfile,
+    (patientProfile) => patientProfile.user,
+  )
+  patientProfile!: PatientProfile;
 
   @CreateDateColumn()
   createdAt!: Date;
